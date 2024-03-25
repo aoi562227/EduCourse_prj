@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eduCourse_prj.DbConnection;
+import eduCourse_prj.VO.StdntAnswerVO;
 import eduCourse_prj.VO.StdntTestVO;
 import oracle.jdbc.proxy.annotation.Pre;
 
@@ -74,5 +75,49 @@ public class StdntTestDAO {
 		
 		return listSTVO;
 	} // slctAllStdntTestList
+	
+	public void slctAllCrs() {
+		
+	}
+	
+	public StdntAnswerVO slctExamAnswer(String course_code) throws SQLException {
+		StdntAnswerVO saVO = null;
+		
+		DbConnection dbCon = DbConnection.getInstance();
+		
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		
+		try {
+			String id = "scott";
+			String pass = "tiger";
+			
+			con = dbCon.getConnection(id, pass);
+			
+			StringBuilder slctAnswer = new StringBuilder();
+			slctAnswer.append("SELECT s.question_number, s.std_answer, t.answer ");
+			slctAnswer.append("FROM std_answer s ");
+			slctAnswer.append("JOIN test_question t ");
+			slctAnswer.append("ON s.course_code = t.course_code AND s.question_number = t.question_number ");
+			slctAnswer.append("WHERE s.course_code = ?");
+
+			String slctAnswerQuery = slctAnswer.toString();
+			
+			pstmt = con.prepareStatement(slctAnswerQuery);
+			pstmt.setString(1, course_code);
+
+			rs = pstmt.executeQuery();
+			
+			while(rs.next()) {
+				saVO = new StdntAnswerVO(rs.getInt("question_number"),rs.getString("std_answer"),rs.getString("question_number"));
+			} // end while
+		} finally {
+			dbCon.dbClose(rs, pstmt, con);
+		} // end finally
+		
+		return saVO;
+	}//slctExamAnswer
+	
 
 } // class
